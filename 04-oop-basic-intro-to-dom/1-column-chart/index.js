@@ -17,28 +17,18 @@ export default class ColumnChart {
   render() {
     const columnChart = document.createElement('div');
 
-    columnChart.innerHTML = `<div class="column-chart" style="--chart-height: 50"></div>`;
-
-    const columnChartTitle = document.createElement('div');
-    columnChartTitle.innerHTML = `
-    <div class="column-chart__title">
-      ${this.label}
-      <a href="${this.link}" class="column-chart__link">View all</a>
-    </div>
+    columnChart.innerHTML = `
+      <div class="column-chart" style="--chart-height: ${this.chartHeight}">
+        <div class="column-chart__title">
+          ${this.label}
+          <a href="${this.link}" class="column-chart__link">View all</a>
+        </div>
+        <div class="column-chart__container">
+          <div data-element="header" class="column-chart__header">${this.value}</div>
+          <div data-element="body" class="column-chart__chart"></div>
+        </div>
+      </div>
     `;
-    columnChart.firstElementChild.append(columnChartTitle.firstElementChild);
-
-    const columnChartContainer = document.createElement('div');
-    columnChartContainer.innerHTML = `
-    <div class="column-chart__container">
-      <div data-element="header" class="column-chart__header">${this.value}</div>
-    </div>
-    `;
-    const columnChartContainerChart = document.createElement('div');
-    columnChartContainerChart.setAttribute("data-element", "body");
-    columnChartContainerChart.setAttribute("class", "column-chart__chart");
-    columnChartContainer.firstElementChild.append(columnChartContainerChart);
-    columnChart.firstElementChild.append(columnChartContainer.firstElementChild);
 
     this.element = columnChart.firstElementChild;
 
@@ -50,21 +40,21 @@ export default class ColumnChart {
    * @param {Array} data
    */
   update(data) {
-    this.element.setAttribute("class", "column-chart");
+    this.element.classList.remove("column-chart", "column-chart_loading");
 
     if (!data.length) {
-      this.element.setAttribute("class", "column-chart_loading");
+      this.element.classList.add("column-chart_loading");
+    } else {
+      this.element.classList.add("column-chart");
     }
 
-    const columnChartContainer = this.element
-      .getElementsByClassName("column-chart__container")[0];
+    const [columnChartContainer] = this.element.getElementsByClassName("column-chart__container");
 
-    const columnChartContainerChart = this.element
-      .getElementsByClassName("column-chart__chart")[0];
+    const [columnChartContainerChart] = this.element.getElementsByClassName("column-chart__chart");
 
     columnChartContainerChart.innerHTML = '';
 
-    for (const obj of this._getColumnProps(data)) {
+    for (const obj of this.getColumnProps(data)) {
       let div = document.createElement('div');
       div.setAttribute("style", `--value: ${obj['value']}`);
       div.setAttribute("data-tooltip", `${obj['percent']}`);
@@ -79,7 +69,7 @@ export default class ColumnChart {
    * @returns {Array}
    * @private
    */
-  _getColumnProps(data) {
+  getColumnProps(data) {
     const maxValue = Math.max(...data);
     const scale = this.chartHeight / maxValue;
 
