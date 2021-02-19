@@ -78,7 +78,7 @@ export default class ColumnChart {
     let url = new URL(this.url, 'https://course-js.javascript.ru');
     url.searchParams.set('from', from.toISOString());
     url.searchParams.set('to', to.toISOString());
-    let response = await fetch(url);
+    let response = await fetch(url.toString());
     let data = await response.json();
     if (!data) {
       this.element.classList.add('column-chart_loading');
